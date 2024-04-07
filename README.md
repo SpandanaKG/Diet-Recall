@@ -1,1 +1,1 @@
-It is a home page of diet recall application.
+It is a diet recall application.
