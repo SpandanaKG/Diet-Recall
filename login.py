@@ -890,6 +890,19 @@ class WeightUI(BoxLayout):
             user_weight = weight
             print(user_weight)
 
+            """
+            this section is the last part after entering email, pass & other inputs
+            so here, at this point we will have all the values now we have to
+            store all the values in db.. before going back to login.
+            """            
+            conn = sqlite3.connect('diet_db.db')
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                        (user_email, user_pass, user_height, user_weight, user_gender, user_diet, user_dob, user_activity_level))
+            conn.commit()
+            conn.close()
+
+
         app = MDApp.get_running_app()
         app.root.current = "login"
 
@@ -1024,7 +1037,7 @@ class GenderUI(MDBoxLayout):
             # we can use in other functions to store in db.
             global user_gender
             user_gender = self.selected_button.text
-            
+
             app = MDApp.get_running_app()
             app.root.current = "Dob"
 
