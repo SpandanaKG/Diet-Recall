@@ -9,7 +9,7 @@ from kivymd.uix.button import MDIconButton
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
-
+import sqlite3
 
 Builder.load_string("""
 <LoginUI>:
@@ -1081,6 +1081,9 @@ class SignUpUI(BoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+            global user_email, user_pass
+            user_email = email_input.text
+            user_pass = password_input.text
             app = MDApp.get_running_app()
             app.root.current = 'Image'
 
