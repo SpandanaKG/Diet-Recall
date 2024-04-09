@@ -9,6 +9,7 @@ from kivymd.uix.button import MDIconButton
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
+import sqlite3
 
 
 Builder.load_string("""
@@ -239,9 +240,9 @@ Builder.load_string("""
         orientation: 'vertical'
         spacing: '0.5cm'  
         TextInput:
-            id: reset_input
+            id: email_input
             multiline: False
-            hint_text: "Username"
+            hint_text: "Email"
             size_hint: None, None
             size_hint_x: 1
             height: '1.50cm'
@@ -816,6 +817,11 @@ class ActivityLevelUI(MDBoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+             # making inputted activity level global so later
+            # we can use in other functions to store in db.
+            global user_activity_level
+            user_activity_level = self.selected_button.text
+
             app = MDApp.get_running_app()
             app.root.current = "height"
 
@@ -848,6 +854,11 @@ class HeightUI(BoxLayout):
             popup.open()
             return
 
+        # making inputted height global so later
+            # we can use in other functions to store in db.
+        global user_height
+        user_height = height
+
         app = MDApp.get_running_app()
         app.root.current = "weight"
 
@@ -874,7 +885,24 @@ class WeightUI(BoxLayout):
             return
 
         else:
-            pass
+            # making inputted weight global so later
+            # we can use in other functions to store in db.
+            global user_weight
+            user_weight = weight
+            print(user_weight)
+
+            """
+            this section is the last part after entering email, pass & other inputs
+            so here, at this point we will have all the values now we have to
+            store all the values in db.. before going back to login.
+            """
+            conn = sqlite3.connect('diet_db.db')
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                        (user_email, user_pass, user_height, user_weight, user_gender, user_diet, user_dob, user_activity_level))
+            conn.commit()
+            conn.close()
+
 
         app = MDApp.get_running_app()
         app.root.current = "login"
@@ -914,11 +942,16 @@ class DateOfBirthUI(BoxLayout):
             popup.open()
 
         else:
+            # making inputted DOB global so later
+            # we can use in other functions to store in db.
+            global user_dob
+            user_dob = "-".join([day_text, month_text, year_text]) #"dd-mm-yyyy" format str to store in db text field
+
             app = MDApp.get_running_app()
             app.root.current = "activity"
 
-    def __init__(self, **kwargs):
-        super(DateOfBirthUI, self).__init__(**kwargs)
+    def _init_(self, **kwargs):
+        super(DateOfBirthUI, self)._init_(**kwargs)
         self.orientation = 'vertical'
         self.padding = ('1cm', '2cm')
         self.pos_hint = {'top': 1}
@@ -931,18 +964,37 @@ class DateOfBirthApp(MDApp):
 
 class ResetPasswordUI(BoxLayout):
     def check_fields2(self):
-        reset_input = self.ids.reset_input
+        email_input = self.ids.email_input
         new_input = self.ids.new_input
         confirm_input = self.ids.confirm_input
 
-        if not reset_input.text or not new_input.text or not confirm_input.text:
+        if not email_input.text or not new_input.text or not confirm_input.text:
             popup = Popup(title='Alert',
                           content=Label(text='**All fields are mandatory', color=(1, 0, 0, 1)),
                           size_hint=(None, None), size=(300, 150))
             popup.open()
 
+        elif email_input.text and not email_input.text.endswith("@gmail.com"):
+            popup = Popup(title='Alert',
+                          content=Label(text='**Please enter a valid email address ', color=(1, 0, 0, 1)),
+                          size_hint=(None, None), size=(400, 150))
+            popup.open()
+
+        elif new_input.text != confirm_input.text:
+            popup = Popup(title='Alert',
+                          content=Label(text='**Passwords do not match', color=(1, 0, 0, 1)),
+                          size_hint=(None, None), size=(300, 150))
+            popup.open()
+
         else:
+            global user_up
+            user_up=new_input
             toast("Password Reset successful")
+            conn = sqlite3.connect('diet_db.db')
+            cursor = conn.cursor()
+            cursor.execute(f"update user set password={user_up} where email={email_input}")
+            conn.commit()
+            conn.close()
             app = MDApp.get_running_app()
             app.root.current = "login"
 class ImageUi(Screen):
@@ -970,6 +1022,12 @@ class DietUI(MDBoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+            # making inputted diet global so later
+            # we can use in other functions to store in db.
+            global user_diet
+            user_diet = self.selected_button.text
+
+
             app = MDApp.get_running_app()
             app.root.current = "Gender"
 
@@ -995,6 +1053,11 @@ class GenderUI(MDBoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+            # making inputted gender global so later
+            # we can use in other functions to store in db.
+            global user_gender
+            user_gender = self.selected_button.text
+
             app = MDApp.get_running_app()
             app.root.current = "Dob"
 
@@ -1009,8 +1072,25 @@ class LoginUI(BoxLayout):
                           content=Label(text='**All fields are mandatory', color=(1, 0, 0, 1)),
                           size_hint=(None, None), size=(300, 150))
             popup.open()
+
         else:
-            print("It should go to the home page")
+            conn = sqlite3.connect('diet_db.db')
+            cursor = conn.cursor()
+            username = username_input.text
+            password = password_input.text
+            cursor.execute("SELECT * FROM user WHERE email=? AND password=?", (username, password))
+            user = cursor.fetchone()
+            conn.close()
+
+            if user:
+                # Authentication successful
+                print("Authentication successful. Proceed to home page.")
+            else:
+                # Authentication failed
+                popup = Popup(title='Alert',
+                              content=Label(text='Invalid username or password', color=(1, 0, 0, 1)),
+                              size_hint=(None, None), size=(300, 150))
+                popup.open()
 
 
 
@@ -1032,12 +1112,23 @@ class SignUpUI(BoxLayout):
                           content=Label(text='**Please enter a valid email address ', color=(1, 0, 0, 1)),
                           size_hint=(None, None), size=(400, 150))
             popup.open()
+
         elif not email_input.text or not password_input.text or not confirm_password_input.text:
             popup = Popup(title='Alert',
                           content=Label(text='**All fields are mandatory', color=(1, 0, 0, 1)),
                           size_hint=(None, None), size=(300, 150))
             popup.open()
+
+        elif password_input.text != confirm_password_input.text:
+            popup = Popup(title='Alert',
+                          content=Label(text='**Passwords do not match', color=(1, 0, 0, 1)),
+                          size_hint=(None, None), size=(300, 150))
+            popup.open()
+
         else:
+            global user_email, user_pass
+            user_email = email_input.text
+            user_pass = password_input.text
             app = MDApp.get_running_app()
             app.root.current = 'Image'
 
@@ -1047,7 +1138,18 @@ class LoginApp(MDApp):
         self.theme_cls.primary_palette = "Green"
         self.theme_cls.primary_hue = "A700"
         self.theme_cls.theme_style = "Light"
-
+        conn = sqlite3.connect('diet_db.db')
+        cursor = conn.cursor()
+        cursor.execute("""create table if not exists user(email TEXT PRIMARY KEY UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        height REAL,
+        weight REAL,
+        sex TEXT,
+        diettype TEXT,
+        dob TEXT,
+        activity TEXT )""")
+        conn.commit()
+        conn.close()
         sm = ScreenManager()
         login_screen = Screen(name='login')
         signup_screen = Screen(name='signup')
