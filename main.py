@@ -7,6 +7,7 @@ from kivy.core.window import Window
 from kivymd.theming import ThemeManager
 from kivy.uix.screenmanager import Screen
 from kivy.uix.image import Image
+import sqlite3
 
 
 Window.size = (370, 697)
@@ -255,6 +256,7 @@ ScreenManager:
                         Widget:
                         MDScreen:
                             Feed:
+                                id : 'fed'
                                 height: '75dp'
             MDNavigationDrawer:
                 id: nav_drawer
@@ -420,8 +422,10 @@ MDScreen:
 
 feedback_helper = """
 MDScreen:
+    id :'fed1'
     height: '75dp'
     MDTextField:
+        id : 'text_input'
         hint_text:'FEEDBACK'
         size_hint_x:None
         width:300
@@ -536,6 +540,11 @@ class Log(Screen):
 
 class DietRecallApp(MDApp):
     def build(self):
+        conn = sqlite3.connect('diet_db.db')
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE if not exists FEEDBACK(feed text)")
+        conn.commit()
+        conn.close()
         screen = Builder.load_string(KV)
         screen1 = Screen()
         theme_cls = ThemeManager()
@@ -552,9 +561,16 @@ class DietRecallApp(MDApp):
             self.theme_cls.theme_style = 'Light'
 
     def show_popup(self):
-        toast('Changes Saved!')
+        screen_feedback = self.root.ids.feedback.screen_manager.fed.fed1.text_input
+        feedback_text = screen_feedback.text
+        conn = sqlite3.connect('diet_db.db')
+        cursor = conn.cursor()
+        cursor.execute(f"insert into feedback values({feedback_text})")
+        conn.commit()
+        conn.close()
         app = MDApp.get_running_app()
         app.root.current = 'menu'
+
 
 def main():
     DietRecallApp().run()
