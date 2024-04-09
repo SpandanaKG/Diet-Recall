@@ -988,11 +988,12 @@ class ResetPasswordUI(BoxLayout):
 
         else:
             global user_up
-            user_up=new_input
+            email_1=email_input.text
+            user_up=new_input.text
             toast("Password Reset successful")
             conn = sqlite3.connect('diet_db.db')
             cursor = conn.cursor()
-            cursor.execute(f"update user set password={user_up} where email={email_input}")
+            cursor.execute("update user set password=?where email=?",(user_up ,email_1))
             conn.commit()
             conn.close()
             app = MDApp.get_running_app()
