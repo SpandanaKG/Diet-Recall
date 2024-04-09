@@ -816,6 +816,11 @@ class ActivityLevelUI(MDBoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+             # making inputted activity level global so later 
+            # we can use in other functions to store in db.
+            global user_activity_level
+            user_activity_level = self.selected_button.text
+
             app = MDApp.get_running_app()
             app.root.current = "height"
 
@@ -848,6 +853,11 @@ class HeightUI(BoxLayout):
             popup.open()
             return
 
+        # making inputted height global so later 
+            # we can use in other functions to store in db.
+        global user_height
+        user_height = height
+
         app = MDApp.get_running_app()
         app.root.current = "weight"
 
@@ -874,7 +884,11 @@ class WeightUI(BoxLayout):
             return
 
         else:
-            pass
+            # making inputted weight global so later 
+            # we can use in other functions to store in db.
+            global user_weight
+            user_weight = weight
+            print(user_weight)
 
         app = MDApp.get_running_app()
         app.root.current = "login"
@@ -914,6 +928,11 @@ class DateOfBirthUI(BoxLayout):
             popup.open()
 
         else:
+            # making inputted DOB global so later 
+            # we can use in other functions to store in db.
+            global user_dob
+            user_dob = "-".join([day_text, month_text, year_text]) #"dd-mm-yyyy" format str to store in db text field
+
             app = MDApp.get_running_app()
             app.root.current = "activity"
 
@@ -970,6 +989,12 @@ class DietUI(MDBoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+            # making inputted diet global so later 
+            # we can use in other functions to store in db.
+            global user_diet
+            user_diet = self.selected_button.text
+
+
             app = MDApp.get_running_app()
             app.root.current = "Gender"
 
@@ -995,6 +1020,11 @@ class GenderUI(MDBoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+            # making inputted gender global so later 
+            # we can use in other functions to store in db.
+            global user_gender
+            user_gender = self.selected_button.text
+            
             app = MDApp.get_running_app()
             app.root.current = "Dob"
 
