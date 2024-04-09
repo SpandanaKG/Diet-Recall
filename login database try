@@ -818,6 +818,8 @@ class ActivityLevelUI(MDBoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+            activity_ui = ActivityLevelUI()
+            final_act = activity_ui.selected_button
             app = MDApp.get_running_app()
             app.root.current = "height"
 
@@ -849,7 +851,7 @@ class HeightUI(BoxLayout):
                           size_hint=(None, None), size=(450, 200))
             popup.open()
             return
-
+        height = self.root.ids.height_input.text
         app = MDApp.get_running_app()
         app.root.current = "weight"
 
@@ -877,7 +879,7 @@ class WeightUI(BoxLayout):
 
         else:
             pass
-
+        weight = self.root.ids.weight_input.text
         app = MDApp.get_running_app()
         app.root.current = "login"
 
@@ -916,6 +918,9 @@ class DateOfBirthUI(BoxLayout):
             popup.open()
 
         else:
+            day = self.root.ids.day_input
+            month = self.root.ids.month_input
+            year = self.root.ids.year_input
             app = MDApp.get_running_app()
             app.root.current = "activity"
 
@@ -972,6 +977,8 @@ class DietUI(MDBoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+            diet_ui = DietUI()
+            final = diet_ui.selected_button
             app = MDApp.get_running_app()
             app.root.current = "Gender"
 
@@ -997,6 +1004,8 @@ class GenderUI(MDBoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+            gender_ui = GenderUI()
+            final_gen = gender_ui.selected_button
             app = MDApp.get_running_app()
             app.root.current = "Dob"
 
@@ -1040,6 +1049,8 @@ class SignUpUI(BoxLayout):
                           size_hint=(None, None), size=(300, 150))
             popup.open()
         else:
+            email = self.root.ids.email_input.text
+            password = self.root.ids.password_input.text
             app = MDApp.get_running_app()
             app.root.current = 'Image'
 
@@ -1049,26 +1060,12 @@ class LoginApp(MDApp):
         self.theme_cls.primary_palette = "Green"
         self.theme_cls.primary_hue = "A700"
         self.theme_cls.theme_style = "Light"
-        email = self.root.ids.email_input.text
-        password = self.root.ids.password_input.text
-        diet_ui = DietUI()
-        final = diet_ui.selected_button
-        gender_ui = GenderUI()
-        final_gen = gender_ui.selected_button
-        day = self.root.ids.day_input
-        month = self.root.ids.month_input
-        year = self.root.ids.year_input
-        activity_ui = ActivityLevelUI()
-        final_act = activity_ui.selected_button
-        height = self.root.ids.height_input.text
-        weight = self.root.ids.weight_input.text
 
-        # conn = sqlite3.connect('diet_db.db')
-        # cursor = conn.cursor()
-        # cursor.execute(f"insert into user values({email},{password},{final},{final_gen},{day},{month},{year},{final_act},{height},{weight})")
-        # conn.commit()
-        # conn.close()
-        print(email)
+        conn = sqlite3.connect('diet_db.db')
+        cursor = conn.cursor()
+        cursor.execute(f"insert into user values({email},{password},{final},{final_gen},{day},{month},{year},{final_act},{height},{weight})")
+        conn.commit()
+        conn.close()
         sm = ScreenManager()
         login_screen = Screen(name='login')
         signup_screen = Screen(name='signup')
