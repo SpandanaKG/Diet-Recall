@@ -520,6 +520,10 @@ class Feed(Screen):
         super(Feed, self).__init__(**kwargs)
         self.feedback = Builder.load_string(feedback_helper)
         self.add_widget(self.feedback)
+        global screen_text
+        screen_text = self.feedback.ids.text_input
+
+
 class Log(Screen):
     def __init__(self, **kwargs):
         super(Log, self).__init__(**kwargs)
@@ -569,13 +573,14 @@ class DietRecallApp(MDApp):
             return None
 
     def show_popup(self):
-        conn = sqlite3.connect('diet_db.db')
-        cursor = conn.cursor()
-        text_screen=self.get_screen("feedback")
-        feedback_text = text_screen.screen_manager1.screen_f.class_f.fed.fed1.text_input
-        cursor.execute("insert into feedback values(?)",(feedback_text))
-        conn.commit()
-        conn.close()
+        # conn = sqlite3.connect('diet_db.db')
+        # cursor = conn.cursor()
+        # feedback_text = screen_text
+        # cursor.execute("insert into feedback values(?)",(feedback_text))
+        # conn.commit()
+        # conn.close()
+        feedback_text = screen_text.text
+        print(feedback_text)
         app = MDApp.get_running_app()
         app.root.current = 'menu'
 
