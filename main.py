@@ -7,6 +7,7 @@ from kivy.core.window import Window
 from kivymd.theming import ThemeManager
 from kivy.uix.screenmanager import Screen
 from kivy.uix.image import Image
+import sqlite3
 
 
 Window.size = (370, 697)
@@ -111,6 +112,7 @@ ScreenManager:
                         Widget:
                         MDScreen:  
                             Profile:
+                                id:'prof'
                                 height: '75dp'
 
             MDNavigationDrawer:
@@ -243,7 +245,7 @@ ScreenManager:
     Screen:
         MDNavigationLayout:
             ScreenManager:
-                id:screen_manager
+                id:screen_manager1
                 Screen:
                     BoxLayout:
                         orientation: 'vertical'
@@ -254,7 +256,9 @@ ScreenManager:
                             pos_hint:{"top": 1}
                         Widget:
                         MDScreen:
+                            id:"class_f"
                             Feed:
+                                id : 'fed'
                                 height: '75dp'
             MDNavigationDrawer:
                 id: nav_drawer
@@ -379,6 +383,7 @@ ScreenManager:
 
 username_helper = """
 MDScreen:
+    id:'pro'
     height: '75dp'
     text:"The end"
     MDTextField:
@@ -415,13 +420,15 @@ MDScreen:
         text:"Submit"
         pos_hint:{'center_x':.5,'center_y':.3}
         on_release:
-            app.show_popup()
+            app.show_popup1()
 """
 
 feedback_helper = """
 MDScreen:
+    id :'fed1'
     height: '75dp'
     MDTextField:
+        id : 'text_input'
         hint_text:'FEEDBACK'
         size_hint_x:None
         width:300
@@ -536,6 +543,11 @@ class Log(Screen):
 
 class DietRecallApp(MDApp):
     def build(self):
+        conn = sqlite3.connect('diet_db.db')
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE if not exists FEEDBACK(feed text)")
+        conn.commit()
+        conn.close()
         screen = Builder.load_string(KV)
         screen1 = Screen()
         theme_cls = ThemeManager()
@@ -550,11 +562,24 @@ class DietRecallApp(MDApp):
             self.theme_cls.theme_style = 'Dark'
         else:
             self.theme_cls.theme_style = 'Light'
+    def get_screen(self, screen_name):
+        if screen_name == "feedback":
+            return FeedbackScreen()
+        else:
+            return None
 
     def show_popup(self):
-        toast('Changes Saved!')
+        conn = sqlite3.connect('diet_db.db')
+        cursor = conn.cursor()
+        text_screen=self.get_screen("feedback")
+        feedback_text = text_screen.screen_manager1.screen_f.class_f.fed.fed1.text_input
+        cursor.execute("insert into feedback values(?)",(feedback_text))
+        conn.commit()
+        conn.close()
         app = MDApp.get_running_app()
         app.root.current = 'menu'
+
+
 
 def main():
     DietRecallApp().run()
