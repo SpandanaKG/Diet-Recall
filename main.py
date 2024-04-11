@@ -516,14 +516,16 @@ class Profile(Screen):
         self.add_widget(self.username)
         self.add_widget(img)
 class Feed(Screen):
-    def __init__(self, **kwargs):
-        super(Feed, self).__init__(**kwargs)
+    def _init_(self, **kwargs):
+        super(Feed, self)._init_(**kwargs)
         self.feedback = Builder.load_string(feedback_helper)
         self.add_widget(self.feedback)
         global user_feed  # Define user_feed as global
         self.screen_text = self.feedback.ids.text_input
         user_feed = self.screen_text
-        # self.screen_text = ''
+        global feed_obj
+        feed_obj = self
+        # self.screen_text = ''
 
 
 class Log(Screen):
@@ -573,7 +575,7 @@ class DietRecallApp(MDApp):
         else:
             return None
 
-    def show_popup(self):
+def show_popup(self):
         conn = sqlite3.connect('diet_db.db')
         cursor = conn.cursor()
         feedback_text = user_feed.text
@@ -581,9 +583,13 @@ class DietRecallApp(MDApp):
         conn.commit()
         conn.close()
         # self.screen_text = ''
+        
+        feed_obj.screen_text.text = ''
+        
+        
         toast("Feedback Saved!")
         app = MDApp.get_running_app()
-        app.root.current = 'menu'
+        app.root.current = 'menu'
 
     def show_popup1(self):
         # conn = sqlite3.connect('diet_db.db')
