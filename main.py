@@ -9,6 +9,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.image import Image
 import sqlite3
 
+import login
 
 Window.size = (370, 697)
 
@@ -425,18 +426,18 @@ MDScreen:
 
 feedback_helper = """
 MDScreen:
-    id :'fed1'
+    id: fed1
     height: '75dp'
     MDTextField:
-        id : 'text_input'
-        hint_text:'FEEDBACK'
-        size_hint_x:None
-        width:300
-        pos_hint:{'center_x':.5,'y':1.2}
-        multiline:True
+        id: text_input
+        hint_text: 'FEEDBACK'
+        size_hint_x: None
+        width: 300
+        pos_hint: {'center_x': .5, 'y': 1.2}
+        multiline: True
     MDRectangleFlatButton:
-        text:"Submit"
-        pos_hint:{'center_x':.5,'center_y':.9}
+        text: "Submit"
+        pos_hint: {'center_x': .5, 'center_y': .9}
         on_release:
             app.show_popup()
 """
@@ -514,14 +515,15 @@ class Profile(Screen):
         self.username = Builder.load_string(username_helper)
         self.add_widget(self.username)
         self.add_widget(img)
-
 class Feed(Screen):
     def __init__(self, **kwargs):
         super(Feed, self).__init__(**kwargs)
         self.feedback = Builder.load_string(feedback_helper)
         self.add_widget(self.feedback)
-        global screen_text
-        screen_text = self.feedback.ids.text_input
+        global user_feed  # Define user_feed as global
+        self.screen_text = self.feedback.ids.text_input
+        user_feed = self.screen_text
+        # self.screen_text = ''
 
 
 class Log(Screen):
@@ -558,7 +560,6 @@ class DietRecallApp(MDApp):
         self.theme_cls.primary_palette = ("Green")
         self.theme_cls.primary_hue="A700"
         self.theme_cls.theme_style=("Light")
-
         return screen
 
     def on_switch_active(self, instance_switch, value):
@@ -573,14 +574,24 @@ class DietRecallApp(MDApp):
             return None
 
     def show_popup(self):
+        conn = sqlite3.connect('diet_db.db')
+        cursor = conn.cursor()
+        feedback_text = user_feed.text
+        cursor.execute("insert into feedback values(?)",(feedback_text,))
+        conn.commit()
+        conn.close()
+        # self.screen_text = ''
+        toast("Feedback Saved!")
+        app = MDApp.get_running_app()
+        app.root.current = 'menu'
+
+    def show_popup1(self):
         # conn = sqlite3.connect('diet_db.db')
         # cursor = conn.cursor()
-        # feedback_text = screen_text
-        # cursor.execute("insert into feedback values(?)",(feedback_text))
+        # cursor.execute("insert into feedback values(?)",(feedback_text,))
         # conn.commit()
         # conn.close()
-        feedback_text = screen_text.text
-        print(feedback_text)
+        toast("Changes Saved!")
         app = MDApp.get_running_app()
         app.root.current = 'menu'
 
