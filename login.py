@@ -11,7 +11,6 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 import sqlite3
 
-
 Builder.load_string("""
 <LoginUI>:
     canvas.before:
@@ -889,7 +888,6 @@ class WeightUI(BoxLayout):
             # we can use in other functions to store in db.
             global user_weight
             user_weight = weight
-            print(user_weight)
 
             """
             this section is the last part after entering email, pass & other inputs
@@ -1065,6 +1063,7 @@ class GenderUI(MDBoxLayout):
 
 class LoginUI(BoxLayout):
     def check_fields_login(self):
+        global user
         username_input = self.ids.username_input
         password_input = self.ids.password_input
 
@@ -1075,6 +1074,7 @@ class LoginUI(BoxLayout):
             popup.open()
 
         else:
+
             conn = sqlite3.connect('diet_db.db')
             cursor = conn.cursor()
             username = username_input.text
@@ -1082,17 +1082,21 @@ class LoginUI(BoxLayout):
             cursor.execute("SELECT * FROM user WHERE email=? AND password=?", (username, password))
             user = cursor.fetchone()
             conn.close()
-
             if user:
-                # Authentication successful
-                print("Authentication successful. Proceed to home page.")
+                app = MDApp.get_running_app()
+                print(self.proceed())
             else:
-                # Authentication failed
                 popup = Popup(title='Alert',
                               content=Label(text='Invalid username or password', color=(1, 0, 0, 1)),
                               size_hint=(None, None), size=(300, 150))
                 popup.open()
+        self.values = user
 
+        def proceed(self):
+            global usr_obj
+            usr_obj = self
+            email_give = user
+            return email_give
 
 
 class SignUpUI(BoxLayout):
@@ -1132,8 +1136,6 @@ class SignUpUI(BoxLayout):
             user_pass = password_input.text
             app = MDApp.get_running_app()
             app.root.current = 'Image'
-
-
 class LoginApp(MDApp):
     def build(self):
         self.theme_cls.primary_palette = "Green"
