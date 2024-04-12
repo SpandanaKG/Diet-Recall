@@ -532,6 +532,7 @@ class Profile(Screen):
         self.username = Builder.load_string(username_helper)
         self.add_widget(self.username)
         self.add_widget(img)
+        # creating the instance of the loginui class and calling the proceed method using the instance of the loginui class
         em = login.LoginUI()
         global email
         email = em.proceed()
@@ -627,6 +628,9 @@ class DietRecallApp(MDApp):
         # cursor.execute("insert into feedback values(?)",(feedback_text,))
         # conn.commit()
         # conn.close()
+
+        
+        # printing the values got from the proceed method
         print(email)
         toast("Changes Saved!")
         app = MDApp.get_running_app()
