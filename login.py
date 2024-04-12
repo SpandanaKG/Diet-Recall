@@ -1099,12 +1099,12 @@ class LoginUI(BoxLayout):
         self.values = user
 
         
-        # method proceed used to access the variable 
-        def proceed(self):
-            global usr_obj
-            usr_obj = self
-            email_give = usr_obj
-            return email_give
+    # method proceed used to access the variable 
+    def proceed(self):
+        global usr_obj
+        usr_obj = self
+        email_give = usr_obj
+        return email_give
 
 
 class SignUpUI(BoxLayout):
