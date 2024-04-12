@@ -1084,14 +1084,21 @@ class LoginUI(BoxLayout):
             conn.close()
             if user:
                 app = MDApp.get_running_app()
+                
+                # printing the return value of the proceed method
                 print(self.proceed())
+                
             else:
                 popup = Popup(title='Alert',
                               content=Label(text='Invalid username or password', color=(1, 0, 0, 1)),
                               size_hint=(None, None), size=(300, 150))
                 popup.open()
+
+        
         # self.values line 
         self.values = user
+
+        
         # method proceed used to access the variable 
         def proceed(self):
             global usr_obj
