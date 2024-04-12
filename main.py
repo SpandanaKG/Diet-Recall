@@ -532,11 +532,15 @@ class Profile(Screen):
         self.username = Builder.load_string(username_helper)
         self.add_widget(self.username)
         self.add_widget(img)
+        em = login.LoginUI()
+        global email
+        email = em.proceed()
+
 
 
 class Feed(Screen):
-    def _init_(self, **kwargs):
-        super(Feed, self)._init_(**kwargs)
+    def __init__(self, **kwargs):
+        super(Feed, self).__init__(**kwargs)
         self.feedback = Builder.load_string(feedback_helper)
         self.add_widget(self.feedback)
         global user_feed  # Define user_feed as global
@@ -577,6 +581,7 @@ class DietRecallApp(MDApp):
         conn = sqlite3.connect('diet_db.db')
         cursor = conn.cursor()
         cursor.execute("CREATE TABLE if not exists FEEDBACK(feed text)")
+        cursor.execute("CREATE TABLE if not exists user_details(email text not null unique primary key, name text, age text,sex text, activity text, weight text,foreign key(email) references user(email) on delete cascade)")
         conn.commit()
         conn.close()
         screen = Builder.load_string(KV)
@@ -622,13 +627,14 @@ class DietRecallApp(MDApp):
         # cursor.execute("insert into feedback values(?)",(feedback_text,))
         # conn.commit()
         # conn.close()
+        print(email)
         toast("Changes Saved!")
         app = MDApp.get_running_app()
         app.root.current = 'menu'
 
 
-def main():
-    DietRecallApp().run()
+DietRecallApp().run()
 
 
-main()
+
+
