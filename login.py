@@ -1090,12 +1090,13 @@ class LoginUI(BoxLayout):
                               content=Label(text='Invalid username or password', color=(1, 0, 0, 1)),
                               size_hint=(None, None), size=(300, 150))
                 popup.open()
+        # self.values line 
         self.values = user
-
+        # method proceed used to access the variable 
         def proceed(self):
             global usr_obj
             usr_obj = self
-            email_give = user
+            email_give = usr_obj
             return email_give
 
 
