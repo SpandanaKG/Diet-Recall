@@ -1,3 +1,4 @@
+import dash
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.lang.builder import Builder
@@ -10,6 +11,11 @@ from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 import sqlite3
+
+'''
+import streamlit as st
+st.header("Main Page")
+'''
 
 Builder.load_string("""
 <LoginUI>:
@@ -1060,10 +1066,10 @@ class GenderUI(MDBoxLayout):
             app = MDApp.get_running_app()
             app.root.current = "Dob"
 
-
+global username
 class LoginUI(BoxLayout):
+
     def check_fields_login(self):
-        global user
         username_input = self.ids.username_input
         password_input = self.ids.password_input
 
@@ -1072,40 +1078,32 @@ class LoginUI(BoxLayout):
                           content=Label(text='**All fields are mandatory', color=(1, 0, 0, 1)),
                           size_hint=(None, None), size=(300, 150))
             popup.open()
-
         else:
-
             conn = sqlite3.connect('diet_db.db')
             cursor = conn.cursor()
             username = username_input.text
             password = password_input.text
+            self.values=username
             cursor.execute("SELECT * FROM user WHERE email=? AND password=?", (username, password))
             user = cursor.fetchone()
             conn.close()
             if user:
                 app = MDApp.get_running_app()
-                
-                # printing the return value of the proceed method
-                print(self.proceed())
-                
+                #@app.callback(dash.dependencies.Output('main.py',"main"))
+
+
             else:
                 popup = Popup(title='Alert',
                               content=Label(text='Invalid username or password', color=(1, 0, 0, 1)),
                               size_hint=(None, None), size=(300, 150))
                 popup.open()
 
-        
-        # self.values line 
-        self.values = user
 
-        
-    # method proceed used to access the variable 
     def proceed(self):
         global usr_obj
         usr_obj = self
         email_give = usr_obj
         return email_give
-
 
 class SignUpUI(BoxLayout):
     def check_fields(self):
