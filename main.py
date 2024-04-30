@@ -1,17 +1,22 @@
-from kivymd.app import MDApp
-from kivymd.toast import toast
-from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton, MDRectangleFlatButton, MDIconButton
-from kivy.lang import Builder
-from kivy.core.window import Window
-from kivymd.theming import ThemeManager
-from kivy.uix.screenmanager import Screen
-from kivy.uix.image import Image
 import sqlite3
 
-import login
+from kivy.core.window import Window
+from kivy.lang import Builder
+from kivy.uix.image import Image
+from kivy.uix.screenmanager import Screen
+from kivymd.app import MDApp
+from kivymd.theming import ThemeManager
+from kivymd.toast import toast
+from kivymd.uix.button import MDFlatButton, MDRectangleFlatButton, MDIconButton
+from kivymd.uix.dialog import MDDialog
+from login import LoginUI
+
+import streamlit as st
+st.header("Main")
 
 Window.size = (370, 697)
+
+email=""
 
 KV = """
 
@@ -532,25 +537,20 @@ class Profile(Screen):
         self.username = Builder.load_string(username_helper)
         self.add_widget(self.username)
         self.add_widget(img)
-        # creating the instance of the loginui class and calling the proceed method using the instance of the loginui class
-        em = login.LoginUI()
-        global email
-        email = em.proceed()
+        email = LoginUI.proceed(self)
 
 
-
+global user_feed
+global feed_obj
 class Feed(Screen):
     def __init__(self, **kwargs):
         super(Feed, self).__init__(**kwargs)
         self.feedback = Builder.load_string(feedback_helper)
         self.add_widget(self.feedback)
-        global user_feed  # Define user_feed as global
+          # Define user_feed as global
         self.screen_text = self.feedback.ids.text_input
         user_feed = self.screen_text
-        global feed_obj
         feed_obj = self
-
-
 
 class Log(Screen):
     def __init__(self, **kwargs):
@@ -628,9 +628,6 @@ class DietRecallApp(MDApp):
         # cursor.execute("insert into feedback values(?)",(feedback_text,))
         # conn.commit()
         # conn.close()
-
-        
-        # printing the values got from the proceed method
         print(email)
         toast("Changes Saved!")
         app = MDApp.get_running_app()
