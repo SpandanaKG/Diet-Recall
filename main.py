@@ -11,9 +11,6 @@ from kivymd.uix.button import MDFlatButton, MDRectangleFlatButton, MDIconButton
 from kivymd.uix.dialog import MDDialog
 from login import LoginUI
 
-import streamlit as st
-st.header("Main")
-
 Window.size = (370, 697)
 
 email=""
